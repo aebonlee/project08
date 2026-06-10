@@ -47,6 +47,53 @@ const M: Meta = {
     { title: 'SVG 연표', body: '연표 데이터를 정규화해 가로 타임라인으로 렌더, 외부 라이브러리 없이 시각화합니다.' },
     { title: '정적·오프라인', body: '내장 DB로 키 없이도 동작하며 응시 기록은 localStorage에 누적됩니다.' },
   ],
+  targets: ['한국사를 처음 잡는 학습자', '연령별 난도로 배우고 싶은 학생·성인', '시험 대비로 퀴즈가 필요한 사람'],
+  goals: [
+    '연령·시대 맞춤 학습카드와 퀴즈로 학습-평가-피드백을 연결한다',
+    '틀린 문제를 해설과 함께 복습하게 한다',
+    'API 키가 없어도 내장 한국사 DB로 동작하게 한다',
+  ],
+  scenarios: [
+    '연령대·시대·모드(학습/시험)를 고른다',
+    '학습카드로 핵심을 익히고 퀴즈를 풀어 즉시 채점받는다',
+    '오답을 해설로 복습하고 점수 추이를 확인한다',
+  ],
+  screens: [
+    { name: '범위 설정', desc: '연령대·시대·학습/시험 모드 선택' },
+    { name: '학습카드', desc: '시대별 핵심 요약·키포인트 + SVG 연표' },
+    { name: '시험 (퀴즈)', desc: '연령 난도 객관식 출제 + 즉시 채점' },
+    { name: '오답 복습', desc: '틀린 문제만 해설과 함께 다시 보기' },
+    { name: '점수 기록', desc: '응시 기록을 저장해 성장 추이 확인' },
+  ],
+  pipelineDetail: [
+    { step: '범위 설정', detail: '연령대·시대·모드(학습/시험)를 구조화한다.' },
+    { step: '콘텐츠 합성 · 스키마 강제', detail: '연령 난도 규칙과 한국사 맥락을 system 프롬프트로 지시하고 JSON 스키마를 고정한다.' },
+    { step: 'GPT 호출(json_object)', detail: '학습카드(요약·연표) 또는 퀴즈(보기·정답 인덱스·해설)를 수신한다.' },
+    { step: '검증 · 폴백', detail: '누락 시 내장 한국사 DB로 안전 제공한다.' },
+    { step: '평가', detail: '객관식 채점 + 점수 산출 + 오답 추출.' },
+    { step: '기록', detail: '응시 점수를 localStorage(history.scores)에 저장해 추이를 확인한다.' },
+  ],
+  promptNotes: [
+    '연령에 따라 system 프롬프트의 어휘·인지수준 규칙을 바꿔 동일 시대도 다른 난도로 출제한다.',
+    '문항을 {보기, 정답 인덱스, 해설} 스키마로 강제해 채점·해설을 결정적으로 처리한다.',
+    'API 키가 없으면 내장 한국사 DB로 동일 구조의 학습카드·퀴즈를 제공한다.',
+  ],
+  architecture:
+    '백엔드 없는 React SPA. 공통 레이아웃·5탭은 src/ui.tsx, 학습·시험 기능은 src/App.tsx가 담당한다. ' +
+    'OpenAI 호출은 src/lib/ai.ts, 연표는 SVG로 렌더하며, 응시 기록은 브라우저 localStorage에 누적한다.',
+  structure: [
+    { path: 'src/App.tsx', desc: '학습카드·퀴즈 출제·채점·오답복습 + 메타(M)' },
+    { path: 'src/ui.tsx', desc: '공통 레이아웃·5탭·UI 헬퍼' },
+    { path: 'src/lib/ai.ts', desc: 'OpenAI chat 헬퍼(ask/hasKey)' },
+    { path: 'src/index.css', desc: '테마·카드/연표 스타일' },
+  ],
+  dataModel: [
+    { name: 'Card', desc: '시대별 학습카드(요약·키포인트·연표)' },
+    { name: 'Quiz', desc: '문항 보기·정답 인덱스·해설' },
+    { name: '점수 기록', desc: '응시 점수. localStorage "history.scores"' },
+  ],
+  deploy:
+    'Vite 빌드(base: "./") 후 GitHub Actions(deploy.yml)가 main push 시 GitHub Pages로 자동 배포 → aebonlee.github.io/project08/',
   stack: ['React 18', 'TypeScript', 'Vite', 'OpenAI GPT', 'SVG', 'localStorage'],
   links: [
     { label: '국사편찬위원회', url: 'https://www.history.go.kr' },
