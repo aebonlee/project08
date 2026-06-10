@@ -94,6 +94,15 @@ const M: Meta = {
   ],
   deploy:
     'Vite 빌드(base: "./") 후 GitHub Actions(deploy.yml)가 main push 시 GitHub Pages로 자동 배포 → aebonlee.github.io/project08/',
+  scope: {
+    include: ['연령·시대 선택 → 학습카드·퀴즈·채점·오답 복습', '점수 기록·SVG 연표', 'AI 출제 + 키 없을 때 내장 DB 폴백'],
+    exclude: ['전 시대 문제은행 완비', '서술형 채점', '학급·랭킹 서버'],
+  },
+  pitch: [
+    '학습 직후 퀴즈로 "인출 연습"(시험 효과)을 살린 설계',
+    '연령별 난도 적응 출제',
+    '오답만 모아 복습해 오개념을 교정하는 점',
+  ],
   stack: ['React 18', 'TypeScript', 'Vite', 'OpenAI GPT', 'SVG', 'localStorage'],
   links: [
     { label: '국사편찬위원회', url: 'https://www.history.go.kr' },
